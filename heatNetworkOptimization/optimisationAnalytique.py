@@ -19,9 +19,9 @@ Dmin = hydroSim.Dmin
 Dmax = hydroSim.Dmax
 
 niteration = 150
-economicConstraint = np.linspace(minEconomicFactor,
-                                 maxEconomicFactor,
-                                 niteration+2)[1:-1:]/maxEconomicFactor
+economicConstraint = np.linspace(0.0,
+                                 1.0,
+                                 niteration)
 
 DijVector = []
 energyVector = []

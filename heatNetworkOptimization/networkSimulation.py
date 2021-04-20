@@ -47,6 +47,7 @@ class hydroNetwork :
 
         # -4 Initialisation
         self.maxEnergyDrop = self.energyDrop(self.Dmin)
+        self.minEnergyDrop = self.energyDrop(self.Dmax)
         self.maxEconomicFactor = self.economicFactor(self.Dmax)
         self.minEconomicFactor = self.economicFactor(self.Dmin)
 
@@ -72,11 +73,13 @@ class hydroNetwork :
 
 
     def energyCostFunc(self,Dij):
-        return self.energyDrop(Dij)/self.maxEnergyDrop
+        return (self.energyDrop(Dij)-self.minEnergyDrop)/     \
+                (self.maxEnergyDrop-self.minEnergyDrop)
 
 
     def economicCostFunc(self,Dij):
-        return self.economicFactor(Dij)/self.maxEconomicFactor
+        return (self.economicFactor(Dij)-self.minEconomicFactor)/ \
+               (self.maxEconomicFactor-self.minEconomicFactor)
 
 
 
@@ -85,12 +88,12 @@ class hydroNetwork :
                   (5*self.__frictionCoef*self.__pipeLength/Dij**6+\
                    4*self.__betaLocal/Dij**5)
         grad = dRhydro*self.__massFlowRate**2*np.abs(self.__massFlowRate)/self.rho
-        return grad/self.maxEnergyDrop
+        return grad/(self.maxEnergyDrop-self.minEnergyDrop)
 
 
     def economicCostGrad(self,Dij):
-
-        return self.aeco*Dij**(self.aeco-1)*self.__pipeLength/self.maxEconomicFactor
+        grad = self.aeco*Dij**(self.aeco-1)*self.__pipeLength
+        return grad/(self.maxEconomicFactor-self.minEconomicFactor)
 
 
 

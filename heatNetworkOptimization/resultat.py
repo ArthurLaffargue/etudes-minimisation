@@ -66,8 +66,8 @@ fig1.savefig("frontsPareto_network.svg",dpi=150)
 plt.show()
 
 
-ax1.set_xlim(20,40)
-ax1.set_ylim(0,20)
+ax1.set_xlim(0,25)
+ax1.set_ylim(0,25)
 fig1.tight_layout()
 fig1.savefig("frontsPareto_zoom.svg",dpi=150)
 
