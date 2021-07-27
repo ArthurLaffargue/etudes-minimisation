@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
+import time
 
 from networkSimulation import hydroNetwork
 
@@ -29,7 +30,7 @@ Dk = Dmin
 Dbounds = np.array([Dmin,Dmax]).T
 options = {"maxiter":2000}
 # figNetwork = plt.figure()
-method = "SLSQP"
+method = "trust-constr"
 
 nfev = 0
 def func(x):
@@ -37,6 +38,8 @@ def func(x):
     nfev += 1
     return hydroSim.energyCostFunc(x)
 
+
+t1 = time.time()
 for k,ecoCons in enumerate(economicConstraint) :
 
     # figNetwork.clf()
@@ -53,7 +56,7 @@ for k,ecoCons in enumerate(economicConstraint) :
                     constraints=cons,
                     options = options,
                     method=method)
-    print(resMin)
+
     Dk = resMin.x
 
     phi_eco = hydroSim.economicCostFunc(Dk)
@@ -73,7 +76,7 @@ for k,ecoCons in enumerate(economicConstraint) :
     print("#"*50)
     print("\n")
 
-
+t2 = time.time()
 
 plt.figure("Pareto front")
 plt.plot(economicVector,energyVector,'o')
@@ -102,3 +105,5 @@ np.savetxt("paretoFront/"+method+".txt",
             header=header)
 
 
+elapsedTime = t2-t1
+print("elapsed time : ", elapsedTime)

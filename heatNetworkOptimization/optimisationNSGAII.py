@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+import time
 
 from networkSimulation import hydroNetwork
 
@@ -26,8 +27,10 @@ print("Appels de la fonction :",ngen*npop)
 f1 = lambda x : -hydroSim.energyCostFunc(x)
 f2 = lambda x : -hydroSim.economicCostFunc(x)
 
+t1 = time.time()
 minAg = optiBiAG(f1,f2,Dmin,Dmax)
 xpop,front_f1,front_f2 = minAg.optimize(npop,ngen,nfront=front_size,verbose=True)
+t2 = time.time()
 
 Dpop = (Dmax-Dmin)*xpop + Dmin
 
@@ -63,3 +66,5 @@ np.savetxt("paretoFront/"+method+".txt",
             resultOptimization,
             header=header)
 
+elapsedTime = t2-t1
+print("elapsed time : ", elapsedTime)

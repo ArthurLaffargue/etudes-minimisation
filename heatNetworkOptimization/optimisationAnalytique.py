@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+import time
 
 from networkSimulation import hydroNetwork
 
@@ -23,6 +24,8 @@ economicConstraint = np.linspace(0.0,
                                  1.0,
                                  niteration)
 
+energyConstraint = np.linspace(0.0,1.0,niteration//2)
+
 DijVector = []
 energyVector = []
 economicVector = []
@@ -33,6 +36,7 @@ Dk = Dmin
 
 # figNetwork = plt.figure()
 
+t1 = time.time()
 penalityFactor = 10000
 for k,ecoCons in enumerate(economicConstraint) :
 
@@ -69,11 +73,11 @@ for k,ecoCons in enumerate(economicConstraint) :
     iterationVector.append(dictMin["iterations"])
     funcCallsVector.append(dictMin["functionCalls"])
 
-    for s in dictMin:
-        if not( s.endswith("History") ):
-            print(s," : ",dictMin[s])
-    print("#"*50)
-    print("\n")
+    # for s in dictMin:
+    #     if not( s.endswith("History") ):
+    #         print(s," : ",dictMin[s])
+    # print("#"*50)
+    # print("\n")
 
     penalityFactor = max(100,0.9*penalityFactor)
 
@@ -85,6 +89,7 @@ for k,ecoCons in enumerate(economicConstraint) :
     #                         cbarLabel='Diamètre [m]')
     # figNetwork.savefig("plotsnetwork/fig_no"+str(k)+".png")
 
+t2 = time.time()
 
 plt.figure("Pareto front")
 plt.plot(economicVector,energyVector,'o')
@@ -112,4 +117,5 @@ np.savetxt("paretoFront/"+method+".txt",
             resultOptimization,
             header=header)
 
-
+elapsedTime = t2-t1
+print("elapsed time : ", elapsedTime)
