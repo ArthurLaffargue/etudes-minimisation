@@ -10,8 +10,7 @@ plt.rc('font',family='Serif')
 
 
 sys.path.append("../../minimisation")
-from _genetic_algorithms import continousBiObjectiveGA
-from _genetic_algorithm import optiBiAG
+from _genetic_algorithms import continousBiObjective_NSGA
 
 hydroSim = hydroNetwork()
 minEconomicFactor = hydroSim.minEconomicFactor
@@ -29,7 +28,7 @@ f1 = lambda x : hydroSim.energyCostFunc(x)
 f2 = lambda x : hydroSim.economicCostFunc(x)
 
 t1 = time.time()
-minAg = continousBiObjectiveGA(f1,f2,Dmin,Dmax,func1_criterion='min',func2_criterion='min')
+minAg = continousBiObjective_NSGA(f1,f2,Dmin,Dmax,func1_criterion='min',func2_criterion='min')
 xpop,front_f1,front_f2 = minAg.optimize(npop,ngen,nfront=front_size,verbose=True)
 t2 = time.time()
 

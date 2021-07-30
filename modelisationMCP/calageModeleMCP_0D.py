@@ -7,7 +7,7 @@ import sys
 plt.rc('font',family='Serif')
 
 sys.path.append("../../minimisation")
-from _minimize_scalar import *
+from minimization import minimize_scalar
 
 
 hvec = np.linspace(50,300,200)
@@ -16,15 +16,18 @@ xmin,xmax = 50,300
 xinit = 0.5*(xmin+xmax)
 
 start = time.time()
-dictgold = goldenSearch(fsim,xmin,xmax,returnDict=True,tol=1e-6)
+dictgold = minimize_scalar(fsim,xmin,xmax,returnDict=True,tol=1e-6,method="goldenSearch")
 inter = time.time()
-dictgrad = scalarGradient(fsim,xinit,xmin,xmax,
+dictgrad = minimize_scalar(fsim,xmin,xmax,
+                method="scalarGradient",
+                xinit=xinit,
                 gtol= 1e-3,
                 tol = 1e-6,
                 returnDict=True,
                 deriveMethod="finite-difference",
                 dh=1e-3,
-                maxIter=25)
+                maxIter=25,
+                )
 end = time.time()
 
 xgold = dictgold["x"]

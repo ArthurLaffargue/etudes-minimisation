@@ -6,7 +6,7 @@ import sys
 plt.rc('font',family='Serif')
 
 sys.path.append("../../minimisation")
-from _minimize_scalar import *
+from minimization import minimize_scalar
 
 
 hvec = np.linspace(50,300,50)
@@ -19,13 +19,16 @@ fsim = simPCM1D.solveEquation
 errfunc = simPCM1D.sqrtError
 
 start = time.time()
-dictgold = goldenSearch(errfunc,xmin,xmax,
+dictgold = minimize_scalar(errfunc,xmin,xmax,
                         returnDict=True,
-                        precallfunc=fsim
-                        ,tol=5e-3)
+                        precallfunc=fsim,
+                        tol=5e-3,
+                        method="goldenSearch")
 inter = time.time()
-dictgrad = scalarGradient(errfunc,xinit,xmin,xmax,
+dictgrad = minimize_scalar(errfunc,xmin,xmax,
                 precallfunc=fsim,
+                method="scalarGradient",
+                xinit=xinit,
                 gtol= 1e-2,
                 tol = 5e-3,
                 returnDict=True,
