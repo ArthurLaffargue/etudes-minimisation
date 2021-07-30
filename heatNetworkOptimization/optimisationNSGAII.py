@@ -10,6 +10,7 @@ plt.rc('font',family='Serif')
 
 
 sys.path.append("../../minimisation")
+from _genetic_algorithms import continousBiObjectiveGA
 from _genetic_algorithm import optiBiAG
 
 hydroSim = hydroNetwork()
@@ -19,23 +20,23 @@ Dmin = hydroSim.Dmin
 Dmax = hydroSim.Dmax
 
 front_size = 150
-npop = front_size
+npop = 150
 ngen = 100000//npop
 
 print("Nombre de générations : ",ngen)
 print("Appels de la fonction :",ngen*npop)
-f1 = lambda x : -hydroSim.energyCostFunc(x)
-f2 = lambda x : -hydroSim.economicCostFunc(x)
+f1 = lambda x : hydroSim.energyCostFunc(x)
+f2 = lambda x : hydroSim.economicCostFunc(x)
 
 t1 = time.time()
-minAg = optiBiAG(f1,f2,Dmin,Dmax)
+minAg = continousBiObjectiveGA(f1,f2,Dmin,Dmax,func1_criterion='min',func2_criterion='min')
 xpop,front_f1,front_f2 = minAg.optimize(npop,ngen,nfront=front_size,verbose=True)
 t2 = time.time()
 
 Dpop = (Dmax-Dmin)*xpop + Dmin
 
-energyVector = -front_f1
-economicVector = -front_f2
+energyVector = front_f1
+economicVector = front_f2
 constraintViolation = np.zeros_like(energyVector,dtype=float)
 iterationVector = np.ones_like(energyVector,dtype=float)*npop/len(energyVector)
 funcCallsVector = np.ones_like(energyVector,dtype=float)*ngen*npop/len(energyVector)

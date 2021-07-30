@@ -5,8 +5,7 @@ import matplotlib.pyplot as plt
 plt.rc('font',family='Serif')
 
 sys.path.append("../../minimisation")
-from _genetic_algorithm import optimizeMonoAG
-
+from _genetic_algorithms import continousSingleObjectiveGA
 
 from heatPumpSimulation import heatPump
 ## Optimisation
@@ -21,7 +20,7 @@ xinit = [Taeo,Te,Tc]
 
 
 sim = heatPump()
-costFunction = lambda x : -sim.cost(x)
+costFunction = lambda x : sim.cost(x)
 
 cons = [{'type': 'ineq', 'fun': sim.contrainte1},
         {'type': 'ineq', 'fun': sim.contrainte2},
@@ -33,21 +32,19 @@ cons = [{'type': 'ineq', 'fun': sim.contrainte1},
 
 npop = 20*3
 ngen = 3*npop
-minAg = optimizeMonoAG(costFunction,xmin,xmax,constraints=cons,preprocess_function=sim.simulateHeatPump)
-minAg.setConstraintMethod("penality")
-minAg.setSelectionMethod("tournament")
-minAg.setElitisme(True)
+minAg = continousSingleObjectiveGA(costFunction,xmin,xmax,constraints=cons,preprocess_function=sim.simulateHeatPump)
 
-Xag,Yag = minAg.optimize(npop,ngen,verbose=True)
+Xag,Yag = minAg.minimize(npop,ngen,verbose=True)
 fitnessArray = minAg.getStatOptimisation()
 
 sim.printDictSim(Xag)
 
 print(Xag)
-print(-Yag)
+print(Yag)
+print("Function calls : ",npop*ngen)
 
 plt.figure(figsize=(8,4))
-plt.plot(-fitnessArray,label='fmin',marker='o',ls='--',markeredgecolor='k',markerfacecolor="y",color='grey')
+plt.plot(fitnessArray,label='fmin',marker='o',ls='--',markeredgecolor='k',markerfacecolor="y",color='grey')
 plt.grid(True)
 plt.xlabel("Nombre de générations")
 plt.ylabel("Fonction objectif")

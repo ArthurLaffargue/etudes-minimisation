@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 plt.rc('font',family='Serif')
 
 sys.path.append("../../minimisation")
-from _simulated_annealing import simulatedAnnealing
+from _simulated_annealing import minimize_simulatedAnnealing
 
 
 from heatPumpSimulation import heatPump
@@ -31,16 +31,21 @@ cons = [{'type': 'ineq', 'fun': sim.contrainte1},
 
 
 maxIter = 10000
-minSA = simulatedAnnealing(sim.cost,
-                            xmin,
-                            xmax,
-                            maxIter=maxIter,
-                            constraints=cons,
-                            preprocess_function=sim.simulateHeatPump)
 
-minSA.autoSetup(npermutations=50,config="highTemp")
-Xsa = minSA.minimize()
-statistique = minSA.statMinimize
+mindict = minimize_simulatedAnnealing(sim.cost,
+                                      xmin,
+                                      xmax,
+                                      maxIter=maxIter,
+                                      constraints=cons,
+                                      preprocess_function=sim.simulateHeatPump,
+                                      autoSetUpIter=50,
+                                      config="highTemp",
+                                      verbose=True,
+                                      returnDict=True,
+                                      storeIterValues=True)
+
+Xsa = mindict['x']
+fhistory = mindict["fHistory"]
 
 sim.printDictSim(Xsa)
 
@@ -48,7 +53,7 @@ print(Xsa)
 print(sim.cost(Xsa))
 
 plt.figure(figsize=(8,4))
-plt.plot(statistique[:,0],label='fmin',marker='o',ls='--',markeredgecolor='k',markerfacecolor="r",color='grey')
+plt.plot(fhistory,label='fmin',marker='o',ls='--',markeredgecolor='k',markerfacecolor="r",color='grey')
 plt.grid(True)
 plt.xlabel("Nombre d'itérations")
 plt.ylabel("Fonction objectif")
