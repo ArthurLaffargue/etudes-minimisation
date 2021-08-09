@@ -38,9 +38,9 @@ mindict = minimize_simulatedAnnealing(sim.cost,
                                       maxIter=maxIter,
                                       constraints=cons,
                                       preprocess_function=sim.simulateHeatPump,
-                                      autoSetUpIter=50,
-                                      config="highTemp",
-                                      verbose=True,
+                                      autoSetUpIter=100,
+                                      config="lowTemp",
+                                      verbose=False,
                                       returnDict=True,
                                       storeIterValues=True)
 

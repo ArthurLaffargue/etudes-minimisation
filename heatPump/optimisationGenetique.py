@@ -34,7 +34,7 @@ npop = 20*3
 ngen = 3*npop
 minAg = continousSingleObjectiveGA(costFunction,xmin,xmax,constraints=cons,preprocess_function=sim.simulateHeatPump)
 
-Xag,Yag = minAg.minimize(npop,ngen,verbose=True)
+Xag,Yag = minAg.minimize(npop,ngen,verbose=False)
 fitnessArray = minAg.getStatOptimisation()
 
 sim.printDictSim(Xag)
