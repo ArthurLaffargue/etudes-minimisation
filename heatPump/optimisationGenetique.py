@@ -30,18 +30,20 @@ cons = [{'type': 'ineq', 'fun': sim.contrainte1},
         {'type': 'ineq', 'fun': sim.contrainte6}]
 
 
-npop = 20*3
-ngen = 3*npop
+npop = 50
+ngen = 300
 minAg = continousSingleObjectiveGA(costFunction,xmin,xmax,constraints=cons,preprocess_function=sim.simulateHeatPump)
+minAg.setConvergenceCriteria(stagnationThreshold=50)
 
 Xag,Yag = minAg.minimize(npop,ngen,verbose=False)
 fitnessArray = minAg.getStatOptimisation()
+fitnessArray = fitnessArray[fitnessArray != None]
 
 sim.printDictSim(Xag)
 
 print(Xag)
 print(Yag)
-print("Function calls : ",npop*ngen)
+print("Function calls : ",npop*len(fitnessArray))
 
 plt.figure(figsize=(8,4))
 plt.plot(fitnessArray,label='fmin',marker='o',ls='--',markeredgecolor='k',markerfacecolor="y",color='grey')
