@@ -33,7 +33,7 @@ cons = [{'type': 'ineq', 'fun': sim.contrainte1},
 npop = 50
 ngen = 300
 minAg = continousSingleObjectiveGA(costFunction,xmin,xmax,constraints=cons,preprocess_function=sim.simulateHeatPump)
-minAg.setConvergenceCriteria(stagnationThreshold=50)
+#minAg.setConvergenceCriteria(stagnationThreshold=50)
 
 Xag,Yag = minAg.minimize(npop,ngen,verbose=False)
 fitnessArray = minAg.getStatOptimisation()

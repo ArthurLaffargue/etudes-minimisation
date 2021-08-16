@@ -19,7 +19,7 @@ Dmin = hydroSim.Dmin
 Dmax = hydroSim.Dmax
 
 front_size = 150
-npop = 75
+npop = 100
 ngen = 100000//npop
 
 print("Nombre de générations : ",ngen)
