@@ -1,69 +1,93 @@
 import numpy as np
 import numpy.random as rd
 
+def latin_hypercube_sampling(shape):
+    popsize = shape[0]
+    ndof = shape[1]
+    dsize  = 1.0/popsize
 
-def autoSetUp(func,ndof,maxiter):
-    # Routine de
-    # 100 permutations aléatoires
-    rd_xarray = np.array([rd.sample(ndof)*(xmax-xmin) + xmin for i in range(100)])
-    farray = np.array([func(xi) for xi in rd_xarray])
-    # Evaluation de la différence d'energie
-    deltaE = farray[1:]-farray[:-1]
-    # Valeur moyenne des valeurs positives
-    deltaE_avg = np.mean(deltaE[deltaE>0])
+    sample_array = dsize*rd.sample(size=shape) 
+    sample_array[:] += np.linspace(0.,1.,popsize)[:,np.newaxis]
+    init_pop = np.zeros(shape)
+    for dim in range(ndof) : 
+        rdm_order = rd.permutation(popsize)
+        init_pop[:,dim] = sample_array[rdm_order,dim]
 
-    initialTemp = -deltaE_avg/np.log(0.60)  #Démarrage haute température
-    finalTemp = -deltaE_avg/np.log(0.01)
-    decreaseRatio = (initialTemp/finalTemp)**(1/maxiter)
-    return initialTemp,decreaseRatio
+    return init_pop
 
-def recuit_simule(func,xmin,xmax,maxiter=1000):
+def recombinaison(index,population,scale_factor):
+    #best1
+    index_list = list(range(len(population)))
+    index_list.remove(index)
+    rd.shuffle(index_list)
+    r1,r2 = index_list[:2]
+    y = population[0,:] + \
+        scale_factor*(population[r1,:]-population[r2,:])
+    return y
 
-    # parametres
-    perturbRatio = 0.5 #Ratio de déplacement maximale
+def differential_evolution(func,xmin,xmax,popsize=20,maxiter=1000):
+    atol,tol = 0.0,0.001
+    CR = 0.9
+    F = [0.5,2.0]
 
-    # solution initiale
     ndof = len(xmin)
-    s0 = rd.sample(ndof)
-    x0 = s0*(xmax-xmin) + xmin
-    E0 = func(x0)
+    population_x = latin_hypercube_sampling((popsize,ndof)) * (xmax-xmin) + xmin
+    population_f = np.array([func(xi) for xi in population_x])
 
-    # initialisation de la température et du taux de décroissance
-    initialTemp,decreaseRatio = autoSetUp(func,ndof,maxiter)
-    T = initialTemp
+    bestarg = np.argmin(population_f)
+    population_x[[0,bestarg],:] = population_x[[bestarg,0],:] 
+    population_f[[0,bestarg]] = population_f[[bestarg,0]] 
+    best_f = population_f[0]
 
-    # solution optimale
-    xopt = x0[:]
-    Eopt = E0
+    for iter in range(maxiter): 
+        
+        scale_factor = rd.sample(ndof)*(F[1]-F[0]) + F[0]
+        for k,xk in enumerate(population_x) :
+            #recombinaison
+            x_prime = recombinaison(k,population_x,scale_factor)
+            x_prime = np.maximum(xmin,np.minimum(x_prime,xmax))
 
-    for iter in range(maxiter):
+            #croisement
+            croisement = rd.sample(size=ndof) <= CR 
+            x_trial = np.where(croisement,x_prime,xk)
 
-        # perturbation de l'etat du systeme
-        x1 = x0 + perturbRatio*2*(rd.sample(ndof)-0.5)
-        x1 = np.minimum(xmax,np.maximum(xmin,x1))
-        E1 = func(x1)
-        deltaE = E1-E0
+            #selection
+            fk = population_f[k]
+            f_trial = func(x_trial)
+            if f_trial < fk : 
+                population_x[k] = x_trial
+                population_f[k] = f_trial
 
-        # acceptation de la solution
-        if deltaE < 0.0 :
-            x0 = x1[:]
-            E0 = E1
+                if f_trial < best_f : 
+                    population_x[[0,k],:] = population_x[[k,0],:] 
+                    population_f[[0,k]] = population_f[[k,0]] 
+                    best_f = population_f[0]
+        
+        #convergence 
+        if np.std(population_f) <= (atol + tol*np.abs(np.mean(population_f))) : 
+            print("SOLUTION CONVERGED : iter %i"%iter)
+            break 
 
-            # solution optimale
-            if E0 < Eopt :
-                xopt = x0[:]
-                Eopt = E0
-
-        # acceptation d'une solution dégradée
-        elif rd.random() < np.exp(-deltaE/T) :
-            x0 = x1[:]
-            E0 = E1
-
-        # réduction de la température
-        T = T*decreaseRatio
-    return xopt
+    return population_x[0]
 
 
+
+if __name__ == '__main__' : 
+    func = lambda x: np.sum(x*x - 10*np.cos(2*np.pi*x)) + 10*np.size(x)
+    lw = np.array([-5.12] * 5)
+    up = np.array([5.12] * 5)
+
+    xopt = differential_evolution(func,lw,up,popsize=50,maxiter=1000)
+    fopt = func(xopt)
+
+    print(xopt)
+    print(fopt)
+
+
+
+
+
+            
 
 
 
