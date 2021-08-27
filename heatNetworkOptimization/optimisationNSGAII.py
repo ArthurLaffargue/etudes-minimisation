@@ -10,7 +10,7 @@ plt.rc('font',family='Serif')
 
 
 sys.path.append("../../minimisation")
-from _genetic_algorithms import continousBiObjective_NSGA
+from _genetic_algorithm import continousBiObjective_NSGA
 
 hydroSim = hydroNetwork()
 minEconomicFactor = hydroSim.minEconomicFactor
@@ -19,7 +19,7 @@ Dmin = hydroSim.Dmin
 Dmax = hydroSim.Dmax
 
 front_size = 150
-npop = 100
+npop = 75
 ngen = 100000//npop
 
 print("Nombre de générations : ",ngen)
@@ -29,7 +29,7 @@ f2 = lambda x : hydroSim.economicCostFunc(x)
 
 t1 = time.time()
 minAg = continousBiObjective_NSGA(f1,f2,Dmin,Dmax,func1_criterion='min',func2_criterion='min')
-xpop,front_f1,front_f2 = minAg.optimize(npop,ngen,nfront=front_size,verbose=True)
+xpop,front_f1,front_f2 = minAg.optimize(npop,ngen,verbose=True,nfront=front_size)
 t2 = time.time()
 
 Dpop = (Dmax-Dmin)*xpop + Dmin

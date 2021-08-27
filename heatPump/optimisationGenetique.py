@@ -1,11 +1,10 @@
 import numpy as np
-from scipy.optimize import minimize
 import sys
 import matplotlib.pyplot as plt
 plt.rc('font',family='Serif')
 
 sys.path.append("../../minimisation")
-from _genetic_algorithms import continousSingleObjectiveGA
+from _genetic_algorithm import continousSingleObjectiveGA
 
 from heatPumpSimulation import heatPump
 ## Optimisation
@@ -32,8 +31,7 @@ cons = [{'type': 'ineq', 'fun': sim.contrainte1},
 
 npop = 50
 ngen = 300
-minAg = continousSingleObjectiveGA(costFunction,xmin,xmax,constraints=cons,preprocess_function=sim.simulateHeatPump)
-#minAg.setConvergenceCriteria(stagnationThreshold=50)
+minAg = continousSingleObjectiveGA(costFunction,xmin,xmax,constraints=cons,preprocess_function=sim.simulateHeatPump,stagThreshold=100)
 
 Xag,Yag = minAg.minimize(npop,ngen,verbose=False)
 fitnessArray = minAg.getStatOptimisation()
